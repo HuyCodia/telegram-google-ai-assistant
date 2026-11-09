@@ -1,0 +1,246 @@
+{
+  "name": "Telegram Sprachnachrichten an Gmail-Assistent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "userIds": "6359137729"
+        }
+      },
+      "id": "62ce48c9-6fdd-4f35-8206-1bc729a52aa1",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        80
+      ],
+      "webhookId": "4e295ef7-b4b9-4009-949a-1e22d31bff98",
+      "credentials": {
+        "telegramApi": {
+          "id": "A0Belz7GEgq365uw",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "or",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.message.voice ? $json.message.voice.file_id : \"\" }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "leftValue": "={{ $json.message.audio ? $json.message.audio.file_id : \"\" }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b26d9962-ac23-40d4-a299-88d1546a6473",
+      "name": "Ist Sprachnachricht",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        224,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice ? $json.message.voice.file_id : $json.message.audio.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "463c99ec-7a9a-42fd-8d7f-7cdb0e7fa09b",
+      "name": "Audiodatei laden",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "webhookId": "0fec2183-62cd-4c1f-b074-6cd3cbb6a993",
+      "credentials": {
+        "telegramApi": {
+          "id": "A0Belz7GEgq365uw",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "0c23cae0-e8cb-49c4-89ad-d89b6c41d95a",
+      "name": "Transkribieren",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "agentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1HLsP5YgWxuUP0Sa",
+          "cachedResultName": "Gmail Assistent (Telegram)"
+        },
+        "message": "={{ $json.text ?? $json.message.text }}",
+        "advanced": {
+          "invokeMode": "perItem",
+          "session": {
+            "session": {
+              "sessionIdType": "customKey",
+              "sessionKey": "={{ 'telegram-' + $('Telegram Trigger').item.json.message.chat.id }}"
+            }
+          }
+        }
+      },
+      "id": "c1afb187-258d-42e5-89b4-06f489680713",
+      "name": "Gmail-Assistent fragen",
+      "type": "n8n-nodes-base.messageAnAgent",
+      "typeVersion": 3.1,
+      "position": [
+        896,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "368d06ff-08db-431a-bd14-02948ed5b9dd",
+      "name": "Antwort senden",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1344,
+        80
+      ],
+      "webhookId": "84a7bb3d-eae1-4652-8837-ca2afe4bd49e",
+      "credentials": {
+        "telegramApi": {
+          "id": "A0Belz7GEgq365uw",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Ist Sprachnachricht",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ist Sprachnachricht": {
+      "main": [
+        [
+          {
+            "node": "Audiodatei laden",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail-Assistent fragen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audiodatei laden": {
+      "main": [
+        [
+          {
+            "node": "Transkribieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transkribieren": {
+      "main": [
+        [
+          {
+            "node": "Gmail-Assistent fragen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail-Assistent fragen": {
+      "main": [
+        [
+          {
+            "node": "Antwort senden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1c18635f-01f5-46af-8263-e3511f0c439a",
+  "meta": {
+    "instanceId": "e8a4fa6f238b11e2811681362429375125d6ef8a92ab06bbdb140e257dbd1e67"
+  },
+  "nodeGroups": [],
+  "id": "dLwGOEJigFisHmdt",
+  "tags": []
+}
