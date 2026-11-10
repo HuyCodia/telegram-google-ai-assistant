@@ -40,10 +40,10 @@ The automation is built using n8n and combines AI processing, API integrations a
 
 ```text
 telegram-google-ai-assistant/
-├── workflow/
-│   └── telegram-google-ai-assistant.json
 ├── screenshots/
 │   └── workflow-overview.png
+├── workflow/
+│   └── telegram-google-ai-assistant.json
 └── README.md
 ```
 
