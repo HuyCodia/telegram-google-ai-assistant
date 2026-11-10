@@ -4,7 +4,15 @@ An AI-powered Telegram assistant built with **n8n**, integrating **Gmail** and *
 
 ## Overview
 
-This project connects Telegram with Google's productivity services through an AI-powered assistant. Users can interact with the assistant via text messages or voice messages to access email and calendar functionality.
+The idea behind this project came from everyday challenges in managing emails and calendar events.
+
+Receiving numerous emails throughout the day can make it time-consuming to review every message individually, decide which ones are relevant, delete unnecessary emails or compose replies. Similarly, finding specific dates and reviewing calendar entries can involve several manual steps.
+
+I wanted to make these everyday tasks easier by developing a personal AI assistant that brings email and calendar management together in one place.
+
+The assistant connects Telegram with Gmail and Google Calendar, allowing users to interact with these services through natural language or voice messages. Instead of manually navigating between different applications, users can simply tell the assistant what they want to do.
+
+The project explores how AI agents and workflow automation can reduce repetitive manual tasks and simplify everyday digital workflows.
 
 The automation is built using n8n and combines AI processing, API integrations and workflow automation.
 
